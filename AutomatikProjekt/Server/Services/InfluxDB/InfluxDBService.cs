@@ -64,11 +64,11 @@ namespace AutomatikProjekt.Server.Services.InfluxDB
 
             if (minimum != null && maximum != null)
             {
-                query += $" |> range({string.Join(",", range.ToArray())}) |> sort:(columns: [\"Time\"])"; //TODO : change coloumn name to match time coloumn in database
+                query += $" |> range({string.Join(",", range.ToArray())}) |> sort:(columns: [\"TimeStamp\"])"; //TODO : change coloumn name to match time coloumn in database
             }
             else
             {
-                query += $" |> range(start: 0) |> sort(columns: [\"Time\"])"; //TODO : change coloumn name to match time coloumn in database
+                query += $" |> range(start: 0) |> sort(columns: [\"TimeStamp\"])"; //TODO : change coloumn name to match time coloumn in database
             }
 
             var fluxTables = await influxDBClient.GetQueryApi().QueryAsync(query, _orgId);
@@ -81,13 +81,17 @@ namespace AutomatikProjekt.Server.Services.InfluxDB
                 {
                     if (!temperatureSensors.ContainsKey(i))
                     {
-                        TemperatureSensor temperatureSensor = new TemperatureSensor(Convert.ToInt64(fluxTable.Records[i].GetValueByKey("_field").Equals("TimeStamp"))); //TODO : This will maybe die, change key.
+                        TemperatureSensor temperatureSensor = new TemperatureSensor(); //TODO : This will maybe die, change key.
                         temperatureSensors.Add(i, temperatureSensor);
                     }
 
                     if (fluxTable.Records[i].GetValueByKey("_field").ToString() == "Temperature")
                     {
                         temperatureSensors[i].Temperature = Convert.ToDouble(fluxTable.Records[i].GetValueByKey("_value"));
+                    }
+                    if (fluxTable.Records[i].GetValueByKey("_field").ToString() == "TimeStamp")
+                    {
+                        temperatureSensors[i].TimeStamp = Convert.ToDateTime(fluxTable.Records[i].GetValueByKey("_value"));
                     }
                 }
             }
@@ -101,12 +105,13 @@ namespace AutomatikProjekt.Server.Services.InfluxDB
             var query = $"from(bucket:\"{_bucketName}\") |> range(start: 0) |> last()";
             var fluxTables = await influxDBClient.GetQueryApi().QueryAsync(query, _orgId);
             
-            TemperatureSensor temperatureSensor = new(Convert.ToInt64(fluxTables.First().Records[0].GetValueByKey("_field").Equals("TimeStamp")));
+            TemperatureSensor temperatureSensor = new();
 
             foreach (var fluxTable in fluxTables)
             {
                 //distanceSensor = new(Convert.ToInt64(fluxTable.Records[0].GetValueByKey("_field").Equals("TimeStamp")));
                 temperatureSensor.Temperature = Convert.ToDouble(fluxTable.Records[0].GetValueByKey("_field").Equals("Temperature"));
+                temperatureSensor.TimeStamp = Convert.ToDateTime(fluxTable.Records[0].GetValueByKey("_field").Equals("TimeStamp"));
             }
 
             return temperatureSensor;

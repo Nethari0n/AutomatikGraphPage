@@ -9,10 +9,5 @@ namespace AutomatikProjekt.Shared
     public class DistanceSensor : BaseClass
     {
         public double Distance { get; set; }
-
-        public DistanceSensor(long timestamp) : base(timestamp)
-        {
-            TimeConverter(timestamp);
-        }
     }
 }

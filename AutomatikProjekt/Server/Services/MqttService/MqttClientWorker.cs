@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.SignalR;
 using AutomatikProjekt.Server.Hubs;
 using System.Configuration;
 using System.Diagnostics;
+using MQTTnet.Protocol;
 
 namespace AutomatikProjekt.Server.Services.MqttService
 {
@@ -64,18 +65,21 @@ namespace AutomatikProjekt.Server.Services.MqttService
                                 x.WithCertificateValidationHandler(_ => true);
 
                                 x.WithSslProtocols(SslProtocols.Tls12);
+                                
                             })
                     .WithTcpServer(_host, port: _port)
                     .WithCredentials(_username, _password)
                     .Build();
                 mqttClient.ApplicationMessageReceivedAsync += async (e) =>
                 {
-                    Debug.WriteLine("------------------------------Send Help-----------------------------------");
+                    Console.WriteLine("------------------------------Send Help-----------------------------------");
                     if (e != null)
                     {
                         string? payload = System.Text.Encoding.Default.GetString(e.ApplicationMessage.PayloadSegment);
-                        TemperatureSensor temperatureSensor = JsonConvert.DeserializeObject<TemperatureSensor>(payload);
-
+                        TemperatureSensor temperatureSensor = JsonConvert.DeserializeObject<TemperatureSensor>(payload)!;
+                        Console.WriteLine($"Payload: {payload}");
+                        Console.WriteLine($"Deserialized temperature: {temperatureSensor.Temperature}");
+                        Console.WriteLine($"Deserialized Time: {temperatureSensor.TimeStamp}");
                         if (temperatureSensor != null)
                         {
                             _influxDBService.Write(temperatureSensor);
@@ -85,6 +89,7 @@ namespace AutomatikProjekt.Server.Services.MqttService
                 };
 
                 await mqttClient.ConnectAsync(mqttClientOption, CancellationToken.None);
+                Debug.WriteLine($"------------------------------Is connected: {mqttClient.IsConnected}-----------------------------------");
 
                 var mqttSubscribeOption = mqttFactory.CreateSubscribeOptionsBuilder()
                     .WithTopicFilter(
@@ -95,8 +100,13 @@ namespace AutomatikProjekt.Server.Services.MqttService
                     .Build();
 
                 await mqttClient.SubscribeAsync(mqttSubscribeOption, CancellationToken.None);
+
+                while (true) { }
+
             }
-            while (true) { }
+
+
+
 
         }
 

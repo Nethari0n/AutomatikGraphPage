@@ -1,16 +1,20 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace AutomatikProjekt.Shared
 {
     public abstract class BaseClass
     {
-        public DateTime TimeStamp { get; set; }
+        [JsonProperty("data.values.timestamp")]
+        public long UnixTime { get => UnixTime; set => TimeConverter(UnixTime); }
+        public DateTime TimeStamp {  get; set; }
 
-        public BaseClass(long timestamp)
+        public BaseClass()
         {
 
         }
