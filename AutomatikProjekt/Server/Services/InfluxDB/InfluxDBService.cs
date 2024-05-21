@@ -20,7 +20,7 @@ namespace AutomatikProjekt.Server.Services.InfluxDB
             _hostName = config["InfluxDB:Host"];
             _bucketName = config["InfluxDB:Bucket"];
             _orgId = config["InfluxDB:Organization"];
-            _measurement = config["InfluxDB:Measurement"];
+            _measurement = "temperature";
 
         }
 
@@ -32,7 +32,7 @@ namespace AutomatikProjekt.Server.Services.InfluxDB
             {
                 var point = PointData.Measurement(_measurement)
                     .Field(nameof(temperature.Temperature), temperature.Temperature)
-                    .Field(nameof(temperature.TimeStamp), temperature.TimeStamp);
+                    .Field(nameof(temperature.TimeStamp), temperature.TimeStamp.ToString());
 
                 writeApi.WritePoint(point, _bucketName, _orgId);
             }
@@ -62,9 +62,10 @@ namespace AutomatikProjekt.Server.Services.InfluxDB
 
             var query = $"from(bucket:\"{_bucketName}\")";
 
+
             if (minimum != null && maximum != null)
             {
-                query += $" |> range({string.Join(",", range.ToArray())}) |> sort:(columns: [\"TimeStamp\"])"; //TODO : change coloumn name to match time coloumn in database
+                query += $" |> range({string.Join(",", range.ToArray())}) |> sort(columns: [\"TimeStamp\"])"; //TODO : change coloumn name to match time coloumn in database
             }
             else
             {
@@ -85,11 +86,11 @@ namespace AutomatikProjekt.Server.Services.InfluxDB
                         temperatureSensors.Add(i, temperatureSensor);
                     }
 
-                    if (fluxTable.Records[i].GetValueByKey("_field").ToString() == "Temperature")
+                    if (fluxTable.Records[i].GetValueByKey("_field").ToString().Equals("Temperature"))
                     {
                         temperatureSensors[i].Temperature = Convert.ToDouble(fluxTable.Records[i].GetValueByKey("_value"));
                     }
-                    if (fluxTable.Records[i].GetValueByKey("_field").ToString() == "TimeStamp")
+                    if (fluxTable.Records[i].GetValueByKey("_field").ToString().Equals("TimeStamp"))
                     {
                         temperatureSensors[i].TimeStamp = Convert.ToDateTime(fluxTable.Records[i].GetValueByKey("_value"));
                     }
@@ -104,7 +105,7 @@ namespace AutomatikProjekt.Server.Services.InfluxDB
 
             var query = $"from(bucket:\"{_bucketName}\") |> range(start: 0) |> last()";
             var fluxTables = await influxDBClient.GetQueryApi().QueryAsync(query, _orgId);
-            
+
             TemperatureSensor temperatureSensor = new();
 
             foreach (var fluxTable in fluxTables)
@@ -114,7 +115,7 @@ namespace AutomatikProjekt.Server.Services.InfluxDB
                 temperatureSensor.TimeStamp = Convert.ToDateTime(fluxTable.Records[0].GetValueByKey("_field").Equals("TimeStamp"));
             }
 
-            return temperatureSensor;
+            return null;
         }
     }
 

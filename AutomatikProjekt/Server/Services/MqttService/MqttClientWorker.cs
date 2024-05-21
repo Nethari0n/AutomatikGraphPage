@@ -76,12 +76,13 @@ namespace AutomatikProjekt.Server.Services.MqttService
                     if (e != null)
                     {
                         string? payload = System.Text.Encoding.Default.GetString(e.ApplicationMessage.PayloadSegment);
-                        TemperatureSensor temperatureSensor = JsonConvert.DeserializeObject<TemperatureSensor>(payload)!;
+                        Root root = JsonConvert.DeserializeObject<Root>(payload)!;
                         Console.WriteLine($"Payload: {payload}");
-                        Console.WriteLine($"Deserialized temperature: {temperatureSensor.Temperature}");
-                        Console.WriteLine($"Deserialized TimeStamp: {temperatureSensor.TimeStamp}");
-                        if (temperatureSensor != null)
+                        Console.WriteLine($"Deserialized temperature: {root.data[0].values[0].value}");
+                        Console.WriteLine($"Deserialized TimeStamp: {root.data[0].values[0].Timestamp}");
+                        if (root != null)
                         {
+                            TemperatureSensor temperatureSensor = new() { TimeStamp = root.data[0].values[0].Timestamp, Temperature = root.data[0].values[0].value  };
                             _influxDBService.Write(temperatureSensor);
                             await _sensorHub.Clients.All.SendAsync("ReceiveTemperatureSensorList", temperatureSensor);
                         }
