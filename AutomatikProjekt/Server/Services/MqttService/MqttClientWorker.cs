@@ -79,7 +79,7 @@ namespace AutomatikProjekt.Server.Services.MqttService
                         TemperatureSensor temperatureSensor = JsonConvert.DeserializeObject<TemperatureSensor>(payload)!;
                         Console.WriteLine($"Payload: {payload}");
                         Console.WriteLine($"Deserialized temperature: {temperatureSensor.Temperature}");
-                        Console.WriteLine($"Deserialized Time: {temperatureSensor.TimeStamp}");
+                        Console.WriteLine($"Deserialized TimeStamp: {temperatureSensor.TimeStamp}");
                         if (temperatureSensor != null)
                         {
                             _influxDBService.Write(temperatureSensor);

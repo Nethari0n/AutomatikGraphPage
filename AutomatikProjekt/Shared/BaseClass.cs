@@ -10,8 +10,9 @@ namespace AutomatikProjekt.Shared
 {
     public abstract class BaseClass
     {
-        [JsonProperty("data.values.timestamp")]
-        public long UnixTime { get => UnixTime; set => TimeConverter(UnixTime); }
+        private long _unixTime;
+        [JsonProperty("timestamp")]
+        public long UnixTime { get => _unixTime; set => TimeConverter(UnixTime); }
         public DateTime TimeStamp {  get; set; }
 
         public BaseClass()

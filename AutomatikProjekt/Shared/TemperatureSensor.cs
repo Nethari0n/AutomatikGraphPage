@@ -10,7 +10,7 @@ namespace AutomatikProjekt.Shared
 {
     public class TemperatureSensor : BaseClass
     {
-        [JsonProperty("data.values.value")]
+        [JsonProperty("value")]
         public double Temperature { get; set; }
     }
 }
