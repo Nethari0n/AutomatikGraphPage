@@ -22,9 +22,8 @@ namespace AutomatikProjekt.Shared
 
         public DateTime Timestamp { get; set; }
 
-
-
-        public void TimeConverter(long timestamp) => Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(timestamp).DateTime;
+        //the IFM board cannot itself convert the time to local time
+        public void TimeConverter(long timestamp) => Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(timestamp).DateTime.ToLocalTime();
 
         public Value()
         {

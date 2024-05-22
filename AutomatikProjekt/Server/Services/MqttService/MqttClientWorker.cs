@@ -44,7 +44,7 @@ namespace AutomatikProjekt.Server.Services.MqttService
 
         protected async override Task ExecuteAsync(CancellationToken cancelToken)
         {
-           await TemperatureMQTTSetup();
+            await TemperatureMQTTSetup();
 
         }
 
@@ -65,7 +65,7 @@ namespace AutomatikProjekt.Server.Services.MqttService
                                 x.WithCertificateValidationHandler(_ => true);
 
                                 x.WithSslProtocols(SslProtocols.Tls12);
-                                
+
                             })
                     .WithTcpServer(_host, port: _port)
                     .WithCredentials(_username, _password)
@@ -75,17 +75,32 @@ namespace AutomatikProjekt.Server.Services.MqttService
                     Console.WriteLine("------------------------------Send Help-----------------------------------");
                     if (e != null)
                     {
+
                         string? payload = System.Text.Encoding.Default.GetString(e.ApplicationMessage.PayloadSegment);
                         Root root = JsonConvert.DeserializeObject<Root>(payload)!;
                         Console.WriteLine($"Payload: {payload}");
                         Console.WriteLine($"Deserialized temperature: {root.data[0].values[0].value}");
                         Console.WriteLine($"Deserialized TimeStamp: {root.data[0].values[0].Timestamp}");
-                        if (root != null)
+                        if (e.ApplicationMessage.Topic == _temperatureTopic)
                         {
-                            TemperatureSensor temperatureSensor = new() { TimeStamp = root.data[0].values[0].Timestamp, Temperature = root.data[0].values[0].value  };
+                            TemperatureSensor temperatureSensor = new() { TimeStamp = root.data[0].values[0].Timestamp, Temperature = root.data[0].values[0].value };
                             _influxDBService.Write(temperatureSensor);
                             await _sensorHub.Clients.All.SendAsync("ReceiveTemperatureSensorList", temperatureSensor);
                         }
+                        else if (e.ApplicationMessage.Topic == _DistanceTopic)
+                        {
+                            DistanceSensor distanceSensor = new() { Distance = root.data[0].values[0].value, TimeStamp = root.data[0].values[0].Timestamp };
+                            await _sensorHub.Clients.All.SendAsync("ReceiveDistanceSensor", distanceSensor);
+                        }
+                        else if (e.ApplicationMessage.Topic == _InductiveTopic)
+                        {
+                            InductiveSensor inductiveSensor = new() { TimeStamp = root.data[0].values[0].Timestamp };
+                            if (root.data[0].values[0].value > 0)
+                                inductiveSensor.IsMetal = true;
+                            await _sensorHub.Clients.All.SendAsync("ReceiveInductiveSensor", inductiveSensor);
+                        }
+
+
                     }
                 };
 
@@ -97,6 +112,16 @@ namespace AutomatikProjekt.Server.Services.MqttService
                         x =>
                         {
                             x.WithTopic(_temperatureTopic);
+                        })
+                    .WithTopicFilter(
+                        x =>
+                        {
+                            x.WithTopic(_DistanceTopic);
+                        })
+                    .WithTopicFilter(
+                        x =>
+                        {
+                            x.WithTopic(_InductiveTopic);
                         })
                     .Build();
 

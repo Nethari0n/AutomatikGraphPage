@@ -54,7 +54,7 @@ namespace AutomatikProjekt
             app.MapGet("/distance", Distance).WithName("GetDistance").WithOpenApi();
             app.MapGet("/inductive", Inductive).WithName("GetInductive").WithOpenApi();
             app.MapGet("/temperature", Temperature).WithName("GetTemperature").WithOpenApi();
-            
+            app.MapGet("/latestTemperature", LatestTemperature).WithName("GetLatestTemperature").WithOpenApi();
 
             static DistanceSensor Distance()
             {
@@ -74,6 +74,14 @@ namespace AutomatikProjekt
 
                 return test;
             }
+
+            static async Task<TemperatureSensor> LatestTemperature(IInfluxDBService influxDBService)
+            {
+                
+                var test = (await influxDBService.GetLatestTemperature());
+
+                return test;
+            }   
 
             app.Run();
         }

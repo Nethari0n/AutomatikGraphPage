@@ -110,12 +110,17 @@ namespace AutomatikProjekt.Server.Services.InfluxDB
 
             foreach (var fluxTable in fluxTables)
             {
-                //distanceSensor = new(Convert.ToInt64(fluxTable.Records[0].GetValueByKey("_field").Equals("TimeStamp")));
-                temperatureSensor.Temperature = Convert.ToDouble(fluxTable.Records[0].GetValueByKey("_field").Equals("Temperature"));
-                temperatureSensor.TimeStamp = Convert.ToDateTime(fluxTable.Records[0].GetValueByKey("_field").Equals("TimeStamp"));
+                if (fluxTable.Records[0].GetValueByKey("_field").ToString().Equals("Temperature"))
+                {
+                    temperatureSensor.Temperature = Convert.ToDouble(fluxTable.Records[0].GetValueByKey("_value"));
+                }
+                if (fluxTable.Records[0].GetValueByKey("_field").ToString().Equals("TimeStamp"))
+                {
+                    temperatureSensor.TimeStamp = Convert.ToDateTime(fluxTable.Records[0].GetValueByKey("_value"));
+                }
             }
 
-            return null;
+            return temperatureSensor;
         }
     }
 
