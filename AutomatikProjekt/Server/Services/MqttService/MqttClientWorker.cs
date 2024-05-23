@@ -44,11 +44,11 @@ namespace AutomatikProjekt.Server.Services.MqttService
 
         protected async override Task ExecuteAsync(CancellationToken cancelToken)
         {
-            await TemperatureMQTTSetup();
+            await MQTTSetup();
 
         }
 
-        internal async Task TemperatureMQTTSetup()
+        internal async Task MQTTSetup()
         {
             MqttFactory mqttFactory = new();
 
@@ -72,15 +72,14 @@ namespace AutomatikProjekt.Server.Services.MqttService
                     .Build();
                 mqttClient.ApplicationMessageReceivedAsync += async (e) =>
                 {
-                    Console.WriteLine("------------------------------Send Help-----------------------------------");
                     if (e != null)
                     {
 
                         string? payload = System.Text.Encoding.Default.GetString(e.ApplicationMessage.PayloadSegment);
                         Root root = JsonConvert.DeserializeObject<Root>(payload)!;
-                        Console.WriteLine($"Payload: {payload}");
-                        Console.WriteLine($"Deserialized temperature: {root.data[0].values[0].value}");
-                        Console.WriteLine($"Deserialized TimeStamp: {root.data[0].values[0].Timestamp}");
+                        //Console.WriteLine($"Payload: {payload}");
+                        //Console.WriteLine($"Deserialized temperature: {root.data[0].values[0].value}");
+                        //Console.WriteLine($"Deserialized TimeStamp: {root.data[0].values[0].Timestamp}");
                         if (e.ApplicationMessage.Topic == _temperatureTopic)
                         {
                             TemperatureSensor temperatureSensor = new() { TimeStamp = root.data[0].values[0].Timestamp, Temperature = root.data[0].values[0].value };
@@ -131,58 +130,6 @@ namespace AutomatikProjekt.Server.Services.MqttService
 
             }
 
-
-
-
-        }
-
-        internal async Task DistanceAndInductiveMQTTSetup()
-        {
-            MqttFactory mqttFactory = new();
-
-            using (var mqttClient = mqttFactory.CreateMqttClient())
-            {
-                MqttClientOptions mqttClientOption = new MqttClientOptionsBuilder()
-                    .WithClientId(_clientID)
-                    .WithCleanSession()
-                    .WithProtocolVersion(MqttProtocolVersion.V311)
-                    .WithKeepAlivePeriod(TimeSpan.FromSeconds(60))
-                    .WithTlsOptions(
-                            x =>
-                            {
-                                x.WithSslProtocols(SslProtocols.Tls12);
-                            })
-                    .WithTcpServer(_host, port: _port)
-                    .WithCredentials(_username, _password)
-                    .Build();
-
-                mqttClient.ApplicationMessageReceivedAsync += async (e) =>
-                {
-                    if (e != null)
-                    {
-                        string? payload = System.Text.Encoding.Default.GetString(e.ApplicationMessage.PayloadSegment);
-                        InductiveSensor inductiveSensor = JsonConvert.DeserializeObject<InductiveSensor>(payload)!;
-
-                        if (inductiveSensor != null)
-                        {
-                            await _sensorHub.Clients.All.SendAsync("ReceiveInductiveSensorList", inductiveSensor);
-                        }
-                    }
-                };
-
-                await mqttClient.ConnectAsync(mqttClientOption, CancellationToken.None);
-
-                var mqttSubscribeOption = mqttFactory.CreateSubscribeOptionsBuilder()
-                    .WithTopicFilter(
-                        x =>
-                        {
-                            x.WithTopic(_InductiveTopic)
-                            .WithTopic(_DistanceTopic);
-                        })
-                    .Build();
-
-                await mqttClient.SubscribeAsync(mqttSubscribeOption, CancellationToken.None);
-            }
         }
     }
 }
