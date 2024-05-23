@@ -1,3 +1,4 @@
+using AutomatikProjekt.Server.Hubs;
 using AutomatikProjekt.Server.Services.InfluxDB;
 using AutomatikProjekt.Server.Services.MqttService;
 using AutomatikProjekt.Shared;
@@ -20,6 +21,7 @@ namespace AutomatikProjekt
 
 
             builder.Services.AddSignalR();
+
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
 
@@ -50,7 +52,7 @@ namespace AutomatikProjekt
             app.MapRazorPages();
             app.MapControllers();
             app.MapFallbackToFile("index.html");
-
+            app.MapHub<SensorHub>("/sensorhub");
             app.MapGet("/distance", Distance).WithName("GetDistance").WithOpenApi();
             app.MapGet("/inductive", Inductive).WithName("GetInductive").WithOpenApi();
             app.MapGet("/temperature", Temperature).WithName("GetTemperature").WithOpenApi();

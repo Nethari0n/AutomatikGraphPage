@@ -84,7 +84,7 @@ namespace AutomatikProjekt.Server.Services.MqttService
                         {
                             TemperatureSensor temperatureSensor = new() { TimeStamp = root.data[0].values[0].Timestamp, Temperature = root.data[0].values[0].value };
                             _influxDBService.Write(temperatureSensor);
-                            await _sensorHub.Clients.All.SendAsync("ReceiveTemperatureSensorList", temperatureSensor);
+                            await _sensorHub.Clients.All.SendAsync("ReceiveLatestTemperature", temperatureSensor);
                         }
                         else if (e.ApplicationMessage.Topic == _DistanceTopic)
                         {
