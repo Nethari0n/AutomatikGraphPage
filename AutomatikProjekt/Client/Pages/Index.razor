@@ -7,7 +7,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-sm-12 my-5">
+        <div class="col-12 nborder shadow-sm p-2 mh-100 mt-2">
             <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem">
                 <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
                 <RadzenLabel Text="Smooth" Component="smooth" Style="margin-right: 1rem;" />
@@ -17,7 +17,7 @@
                 <RadzenLabel Text="Show Markers" Component="markers" />
             </RadzenCard>
             <RadzenChart>
-                <RadzenLineSeries Smooth="@smooth" Data="@temperatures" CategoryProperty="TimeStamp" Title="2023" LineType="LineType.Dashed" ValueProperty="Temperature">
+                <RadzenLineSeries Smooth="@smooth" Data="@temperatures" CategoryProperty="TimeStamp" Title="Temperatur" LineType="LineType.Dashed" ValueProperty="Temperature">
                     <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Square" />
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenLineSeries>
@@ -25,12 +25,22 @@
                 <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Circle" />
                 <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenLineSeries> *@
-                <RadzenCategoryAxis Padding="20" />
-                @*    <RadzenValueAxis Formatter="@FormatAsUSD">
-                <RadzenGridLines Visible="true" />
-                <RadzenAxisTitle Text="Revenue in USD" />
-                </RadzenValueAxis> *@
+
+                <RadzenCategoryAxis Formatter=@(value => ((DateTime)value).ToString())>
+                    <RadzenTicks>
+                        <Template>
+                            <style>
+                                .rz-tick-text {
+                                   overflow: visible;
+                                }
+                            </style>
+                            <text class="rz-tick-text" style="text-anchor: start; transform: translate(@(context.X)px, @(context.Y + 10)px) rotate(45deg);">@context.Value</text>
+                        </Template>
+                    </RadzenTicks>
+                </RadzenCategoryAxis>
             </RadzenChart>
+
+
         </div>
     </div>
 </div>
@@ -42,6 +52,8 @@
 
     List<TemperatureSensor> temperatures = new();
     TemperatureSensor temperatureSensor = new();
+    DistanceSensor distanceSensor = new();
+    InductiveSensor inductiveSensor = new();
     HubConnection Connection = default!;
 
 
@@ -59,12 +71,26 @@
         });
 
         Connection.On<TemperatureSensor>("ReceiveLatestTemperature", async (receivedTemperature) =>
-       {
-           temperatureSensor = receivedTemperature;
-           temperatures.Add(receivedTemperature);
+        {
+            temperatureSensor = receivedTemperature;
+            temperatures.Add(receivedTemperature);
 
-           // allDeviceTelemetries = GetSortedTelemetriesTime();
-           // deviceTelemetries = GetSortedTelemtriesDevice();
+            // allDeviceTelemetries = GetSortedTelemetriesTime();
+            // deviceTelemetries = GetSortedTelemtriesDevice();
+
+            await InvokeAsync(StateHasChanged);
+        });
+
+        Connection.On<DistanceSensor>("ReceiveDistanceSensor", async (receivedDistance) =>
+       {
+           distanceSensor = receivedDistance;
+
+           await InvokeAsync(StateHasChanged);
+       });
+
+        Connection.On<InductiveSensor>("ReceiveInductiveSensor", async (receivedInductive) =>
+       {
+           inductiveSensor = receivedInductive;
 
            await InvokeAsync(StateHasChanged);
        });

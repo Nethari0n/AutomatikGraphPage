@@ -99,3 +99,9 @@ a, .btn-link {
     .loading-progress-text:after {
         content: var(--blazor-load-percentage-text, "Loading");
     }
+
+
+rz-tick-text {
+    text-anchor: start;
+    transform: translate(@(context.X)px, @(context.Y + 10)px) rotate(45deg);
+}
