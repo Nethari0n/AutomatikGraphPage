@@ -101,7 +101,15 @@ a, .btn-link {
     }
 
 
-rz-tick-text {
-    text-anchor: start;
-    transform: translate(@(context.X)px, @(context.Y + 10)px) rotate(45deg);
+.rz-tick-text {
+    overflow: visible;
+}
+
+
+.PaddingGraph {
+    padding-bottom: 75px !important;
+}
+
+.test{
+    max-height: 125% !important;
 }
