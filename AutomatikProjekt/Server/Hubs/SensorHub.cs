@@ -27,5 +27,7 @@ namespace AutomatikProjekt.Server.Hubs
                 Console.WriteLine(e);
             }
         }
+
+      
     }
 }

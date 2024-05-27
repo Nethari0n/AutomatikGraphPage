@@ -65,7 +65,7 @@ namespace AutomatikProjekt.Server.Services.InfluxDB
 
             if (minimum != null && maximum != null)
             {
-                query += $" |> range({string.Join(",", range.ToArray())}) |> sort(columns: [\"TimeStamp\"])"; //TODO : change coloumn name to match time coloumn in database
+                query += $" |> range({string.Join(",", range.ToArray())}) |> sort(columns: [\"time\"])"; //TODO : change coloumn name to match time coloumn in database
             }
             else
             {
