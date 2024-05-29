@@ -104,7 +104,11 @@
         Connection.On<List<TemperatureSensor>>("ReceiveTemperatureSensorList", async (receivedTemperatures) =>
         {
             temperatures = receivedTemperatures;
-            temperatures = temperatures.Where(x => x.TimeStamp >= DateTime.Now.AddDays(-1)).ToList();
+            if (!filter)
+            {
+                temperatures = temperatures.Where(x => x.TimeStamp >= DateTime.Now.AddDays(-1)).ToList();
+            }
+           
             await InvokeAsync(StateHasChanged);
 
         });
