@@ -4,6 +4,7 @@
 @using AutomatikProjekt.Shared
 @using Microsoft.AspNetCore.SignalR.Client;
 @inject NavigationManager NavigationManager
+@inject IToastService toastService
 
 <div class="container">
     <div class="row">
@@ -19,7 +20,7 @@
                 </div>
                 <div>
                     <RadzenLabel Text="Slut Dato:" Component="EndDate" />
-                    <RadzenDatePicker @bind-Value=@EndDate ShowTime="true" HoursStep="1" MinutesStep="5" DateFormat="dd/MM/yyyy HH:mm" Name="EndDate" />
+                    <RadzenDatePicker @bind-Value=@EndDate ShowTime="true" HoursStep="1" Min="@StartDate.AddDays(-1)" MinutesStep="5" DateFormat="dd/MM/yyyy HH:mm" Name="EndDate" />
                 </div>
                 <div>
                     <RadzenButton style="width: 160px" BusyText="Henter Data" IsBusy=@busy Click=@OnFilterClick Text="Filtrer" />
@@ -106,9 +107,9 @@
             temperatures = receivedTemperatures;
             if (!filter)
             {
-                temperatures = temperatures.Where(x => x.TimeStamp >= DateTime.Now.AddDays(-1)).ToList();
+                temperatures = temperatures.Where(x => x.TimeStamp >= DateTime.Now.AddDays(-1)).ToList(); 
             }
-           
+
             await InvokeAsync(StateHasChanged);
 
         });
@@ -148,9 +149,16 @@
     async Task OnFilterClick()
     {
         busy = true;
-        await Connection.SendAsync("GetTemperatureSensor");
-        temperatures = temperatures.Where(x => x.TimeStamp >= StartDate && x.TimeStamp <= EndDate).ToList();
-        filter = true;
+        if (StartDate! < EndDate)
+        {
+            await Connection.SendAsync("GetTemperatureSensor");
+            temperatures = temperatures.Where(x => x.TimeStamp >= StartDate && x.TimeStamp <= EndDate).ToList();
+            filter = true;
+        }
+        else
+            toastService.ShowError("Slut Data må ikke være før Start Dato");
+        
+
         busy = false;
     }
 
