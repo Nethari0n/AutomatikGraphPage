@@ -38,7 +38,7 @@ WebAPI exists for Debugging purposes
 
 **Client**
 
--   **Blazored.Toast (4.2.1)**: Provides toast notifications for Blazor applications. NuGet | [GitHub](https://github.com/Blazored/Toast)
+-   **Blazored.Toast (4.2.1)**: Provides toast notifications for Blazor applications. [NuGet](https://www.nuget.org/packages/Blazored.Toast/4.2.1) | [GitHub](https://github.com/Blazored/Toast)
 -   **Microsoft.AspNetCore.SignalR.Client (7.0.19)**: Enables the app to use SignalR for real-time web functionality. [NuGet](https://www.nuget.org/packages/Microsoft.AspNetCore.SignalR.Client/7.0.19) | [Documentation](https://learn.microsoft.com/en-us/aspnet/core/signalr/dotnet-client?view=aspnetcore-7.0)
 -   **Microsoft.AspNetCore.SignalR.Common (7.0.19)**: Common libraries required for SignalR functionality. [NuGet](https://www.nuget.org/packages/Microsoft.AspNetCore.SignalR.common/7.0.19)
 -   **Radzen.Blazor (4.30.2)**: Offers a set of UI components for building rich, interactive web applications with Blazor. [NuGet](https://www.nuget.org/packages/Radzen.Blazor/4.30.2) | [Documentation](https://blazor.radzen.com/)
