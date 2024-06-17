@@ -78,6 +78,7 @@ in Visual Studio, right click on the "automatikprojekt.server" project, and clic
 
 
 **Setting up IFM Moneo**
+
 Start here: [https://www.ifm.com/dk/da/shared/moneo-iiot-platform/products/produkter](https://www.ifm.com/dk/da/shared/moneo-iiot-platform/products/produkter)
 
 Download the free Moneo trial version: [https://www.ifm.com/dk/da/shared/moneo-iiot-platform/products/moneo-gratis-proveversion](https://www.ifm.com/dk/da/shared/moneo-iiot-platform/products/moneo-gratis-proveversion)
