@@ -112,3 +112,5 @@ Ref: Moneo edgeConnect MQTT adapter
 Note that the Mosquitto broker now only supports TLS communication via port 8883:
 
 ![MoneoMQTTScreen.png](./Images/MoneoMQTTScreen.png)
+
+(Shown is setup with a Mosquitto MQTT Broker)
