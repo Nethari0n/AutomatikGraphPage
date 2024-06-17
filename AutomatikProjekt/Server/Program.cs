@@ -68,10 +68,10 @@ namespace AutomatikProjekt
                 return null;
             }
 
-            static async Task<List<TemperatureSensor>> Temperature(IInfluxDBService influxDBService)
+            static async Task<List<TemperatureSensor>> Temperature(IInfluxDBService influxDBService, DateTime startTime, DateTime endTime)
             {
-                string dateTimeStart = DateTime.Parse("16-05-2024 08:14:42").ToString();
-                string dateTimeEnd = DateTime.Now.ToString();
+                string dateTimeStart = startTime.ToString();
+                string dateTimeEnd = endTime.ToString();
                 var test = (await influxDBService.QueryDB(dateTimeStart, dateTimeEnd));
 
                 return test;
