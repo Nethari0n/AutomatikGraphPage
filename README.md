@@ -51,9 +51,61 @@ WebAPI exists for Debugging purposes
 
 ## Getting Started
 
-Create new accounts at [HiveMQ](https://www.hivemq.com/) and [InfluxDB](https://www.influxdata.com/)
+-   **Create HiveMQ Account**:
+    
+    -   Sign up for a HiveMQ account on their website.
+    
+-   **Create Cluster**:
+    
+    -   Follow the on-screen guide to create a new cluster.
+    -   Navigate to "Manage Cluster" and note down your Cluster URL and Port.
+-   **Access Management**:
+    
+    -   Go to "Access Management" in your HiveMQ dashboard.
+-   **Create Credentials**:
+    
+    -   Create 2 sets of credentials:
+        -   **For IFM Moneo Board (Publisher)**:
+            -   Set permissions to publish only.
+        -   **For WebApp (Subscriber)**:
+            -   Set permissions to subscribe.
+
+Ensure you follow these steps carefully to configure your HiveMQ setup as required.
+
+
+-   **Create InfluxDB Account**:
+    
+    -   Sign up for an InfluxDB account on their website.
+    -   Provide a "company name" and an Organization name during the account creation (note down the Organization name for later use).
+    -   Choose EU Frankfurt as the storage provider.
+    -   Select the free tier option.
+    
+    
+-   **Manage Databases & Security**:
+    
+    -   On the dashboard, navigate to "Manage Databases & Security".
+    -   Choose "Database Manager" and select "Go to Buckets".
+   
+-   **Create Bucket**:
+    
+    -   Create a new bucket, give it a name, and save that name for future reference.
+
+- **Manage Tokens**:
+    
+    -   Go back to the dashboard and select "Manage Databases & Security" again.
+    -   Choose "Go to Tokens".
+    -   Create an API token with access to everything. Remember to save it as you won't be able to view it again after creation.
+
+-   **Organization Settings**:
+    
+    -   Navigate to the organization name you set up when creating your account.
+    -   Click on "Settings".
+    -   Copy your Organization ID and Cluster URL from this section.
+
+Ensure you save all necessary information securely for future configuration and usage.
 
 **Add a secrets.json**
+
 in Visual Studio, right click on the "automatikprojekt.server" project, and click on "Manage User Secrets", and add the JSON below, and adjust it acording to your credentials.
 
      {
