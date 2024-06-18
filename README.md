@@ -14,8 +14,6 @@ WebAPI exists for Debugging purposes
 ## API endpoints
 | API                   | Description                                         | RequestBody        | Response Body               |
 |-----------------------|-----------------------------------------------------|--------------------|-----------------------------|
-| Get /distance         | Gets latest distance reading                        | null               | Distance object             |
-| Get /inductive        | Gets latest inductive reading                       | null               | Inductive object            |
 | Get /temperature      | Gets all saved temperatures within given parameters | startdate, enddate | List of temperature objects |
 | Get /latestTemperature | Gets Latest temperature                             | null               | Temperature object          |
 

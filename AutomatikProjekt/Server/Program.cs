@@ -53,20 +53,20 @@ namespace AutomatikProjekt
             app.MapControllers();
             app.MapFallbackToFile("index.html");
             app.MapHub<SensorHub>("/sensorhub");
-            app.MapGet("/distance", Distance).WithName("GetDistance").WithOpenApi();
-            app.MapGet("/inductive", Inductive).WithName("GetInductive").WithOpenApi();
+            //app.MapGet("/distance", Distance).WithName("GetDistance").WithOpenApi();
+            //app.MapGet("/inductive", Inductive).WithName("GetInductive").WithOpenApi();
             app.MapGet("/temperature", Temperature).WithName("GetTemperature").WithOpenApi();
             app.MapGet("/latestTemperature", LatestTemperature).WithName("GetLatestTemperature").WithOpenApi();
 
-            static DistanceSensor Distance()
-            {
-                return null;
-            }
+            //static DistanceSensor Distance()
+            //{
+            //    return null;
+            //}
 
-            static InductiveSensor Inductive()
-            {
-                return null;
-            }
+            //static InductiveSensor Inductive()
+            //{
+            //    return null;
+            //}
 
             static async Task<List<TemperatureSensor>> Temperature(IInfluxDBService influxDBService, DateTime startTime, DateTime endTime)
             {
