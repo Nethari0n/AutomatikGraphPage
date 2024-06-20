@@ -45,7 +45,7 @@ WebAPI exists for Debugging purposes
 -   **InfluxDB.Client (4.14.0)**: Client library for interacting with InfluxDB. [NuGet](https://www.nuget.org/packages/InfluxDB.Client/4.14.0) | [GitHub](https://github.com/influxdata/influxdb-client-csharp)
 -   **Microsoft.AspNetCore.OpenApi (7.0.18)**: Adds OpenAPI support for ASP.NET Core applications. [NuGet](https://www.nuget.org/packages/Microsoft.AspNetCore.OpenApi/7.0.18) | [Documentation](https://learn.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-7.0#openapi-support)
 -   **MQTTnet (4.3.3.952)**: MQTT library for .NET to connect, publish, and subscribe to MQTT brokers. [NuGet](https://www.nuget.org/packages/MQTTnet/4.3.3.952) | [GitHub](https://github.com/dotnet/MQTTnet)
--   **Swashbuckle.AspNetCore (6.5.0)**: Swagger tools for documenting APIs built with ASP.NET Core. NuGet | [GitHub](https://github.com/domaindrivendev/Swashbuckle.AspNetCore)
+-   **Swashbuckle.AspNetCore (6.5.0)**: Swagger tools for documenting APIs built with ASP.NET Core. [NuGet](https://www.nuget.org/packages/Swashbuckle.AspNetCore.Swagger/6.5.0) | [GitHub](https://github.com/domaindrivendev/Swashbuckle.AspNetCore)
 
 ## Getting Started
 
