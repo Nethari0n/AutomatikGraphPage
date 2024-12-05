@@ -1,176 +1,172 @@
 ﻿@page "/"
 
 @using System.Globalization
+@using AutomatikProjekt.Shared
+@using Microsoft.AspNetCore.SignalR.Client;
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
 
-<div Class="rz-p-0 rz-p-md-12">
-    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
-        <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
-        <RadzenLabel Text="Smooth" Component="smooth" Class="rz-mr-6" />
-        <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-        <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
-    </RadzenStack>
+<div class="container">
+    <div class="row">
+        <div class="col-12 border shadow-sm p-2 mh-100 mt-2 PaddingGraph">
+            <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between">
+                <div>
+                    <RadzenLabel Text="Vis Markører:" Component="markers" />
+                    <RadzenCheckBox @bind-Value="@showMarkers" Name="markers" class="mr-2"></RadzenCheckBox>
+                </div>
+                <div>
+                    <RadzenLabel Text="Start Dato:" Component="StartDate" />
+                    <RadzenDatePicker @bind-Value=@StartDate ShowTime="true" HoursStep="1" MinutesStep="5" DateFormat="dd/MM/yyyy HH:mm" Name="StartDate" />
+                </div>
+                <div>
+                    <RadzenLabel Text="Slut Dato:" Component="EndDate" />
+                    <RadzenDatePicker @bind-Value=@EndDate ShowTime="true" HoursStep="1" Min="@StartDate.AddDays(-1)" MinutesStep="5" DateFormat="dd/MM/yyyy HH:mm" Name="EndDate" />
+                </div>
+                <div>
+                    <RadzenButton style="width: 160px" BusyText="Henter Data" IsBusy=@busy Click=@OnFilterClick Text="Filtrer" />
+                    <RadzenButton style="width: 160px" BusyText="Henter Data" IsBusy=@busy Click=@OnFilterResetClick Text="Nulstil" />
+                </div>
 
-    <RadzenChart>
-        <RadzenAreaSeries Smooth="@smooth" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue" RenderingOrder="1">
-            <RadzenSeriesDataLabels Visible="@showDataLabels" />
-        </RadzenAreaSeries>
-        <RadzenAreaSeries Smooth="@smooth" Data="@revenue2024" CategoryProperty="Date" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
-            <RadzenSeriesDataLabels Visible="@showDataLabels" />
-        </RadzenAreaSeries>
-        <RadzenCategoryAxis Padding="20" />
-        <RadzenValueAxis Formatter="@FormatAsUSD">
-            <RadzenGridLines Visible="true" />
-            <RadzenAxisTitle Text="Revenue in USD" />
-        </RadzenValueAxis>
-    </RadzenChart>
+
+            </RadzenCard>
+            <RadzenChart>
+                <style>
+                    .rz-chart svg {
+                        overflow: visible;
+                    }
+                </style>
+                <RadzenLineSeries Data="@temperatures" CategoryProperty="TimeStamp" Title="Temperatur" LineType="LineType.Dashed" ValueProperty="Temperature">
+                    <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Circle" />
+
+                </RadzenLineSeries>
+                <RadzenCategoryAxis Formatter=@(value => ((DateTime)value).ToString())>
+                    <RadzenTicks>
+                        <Template>
+                            <style>
+                                .rz-tick-text {
+                                    overflow: visible;
+                                }
+                            </style>
+                            <text class="rz-tick-text" style="text-anchor: start; transform: translate(@(context.X)px, @(context.Y + 10)px) rotate(45deg);">@context.Value</text>
+                        </Template>
+                    </RadzenTicks>
+                </RadzenCategoryAxis>
+            </RadzenChart>
+        </div>
+    </div>
+    <div class="row border shadow-sm mt-3">
+        <div class="col-4 d-flex flex-column justify-content-center text-center " style="min-height: 25rem; border-radius:10px;">
+            <h1>@($"Distance: {distanceSensor.Distance}")</h1>
+            <div class="border m-auto my-2 w-50 shadow-lg"></div>
+            <div class="col-12 d-flex justify-content-center">
+                <h5 style="color:gray;" class="fst-italic">@distanceSensor.TimeStamp.ToString("dd/MM/yyyy HH:mm")</h5>
+            </div>
+        </div>
+
+        <div class="col-4  d-flex flex-column justify-content-center text-center" style="min-height: 25rem; border-radius:10px;">
+            <h1>@($"Temperatur: {temperatureSensor.Temperature}")</h1>
+            <div class="border m-auto my-2 w-50 shadow-lg"></div>
+            <div class="col-12 d-flex justify-content-center">
+                <h5 style="color:gray;" class="fst-italic">@temperatureSensor.TimeStamp.ToString("dd/MM/yyyy HH:mm")</h5>
+            </div>
+        </div>
+
+        <div class="col-4  d-flex flex-column justify-content-center text-center" style="min-height: 25rem; border-radius:10px;">
+            <h1>@($"Induktiv: {inductiveSensor.IsMetal}")</h1>
+            <div class="border m-auto my-2 w-50 shadow-lg"></div>
+            <div class="col-12 d-flex justify-content-center">
+                <h5 style="color:gray;" class="fst-italic">@inductiveSensor.TimeStamp.ToString("dd/MM/yyyy HH:mm")</h5>
+            </div>
+        </div>
+    </div>
 </div>
 
+
 @code {
-    bool smooth = true;
-    bool showDataLabels = false;
 
-   
+    bool busy;
+    bool filter = false;
+    bool showMarkers = true;
+    DateTime StartDate = DateTime.Now.AddHours(-1);
+    DateTime EndDate = DateTime.Now;
+    List<TemperatureSensor> temperatures = new();
+    TemperatureSensor temperatureSensor = new();
+    DistanceSensor distanceSensor = new();
+    InductiveSensor inductiveSensor = new();
+    HubConnection Connection = default!;
 
 
-    // protected override void OnInitialized()
-    // {
-    //     MyProperty = MyProperty.AddSeconds(1714046757363).ToLocalTime();
-    // }
-
-    class DataItem
+    protected override async Task OnInitializedAsync()
     {
-        public string Date { get; set; }
-        public double Revenue { get; set; }
+        Connection = new HubConnectionBuilder()
+               .WithUrl("https://localhost:7075/sensorhub")
+              .Build();
+
+        Connection.On<List<TemperatureSensor>>("ReceiveTemperatureSensorList", async (receivedTemperatures) =>
+        {
+            temperatures = receivedTemperatures;
+            if (!filter)
+            {
+                temperatures = temperatures.Where(x => x.TimeStamp >= DateTime.Now.AddDays(-1)).ToList(); 
+            }
+
+            await InvokeAsync(StateHasChanged);
+
+        });
+
+        Connection.On<TemperatureSensor>("ReceiveLatestTemperature", async (receivedTemperature) =>
+        {
+            if (!filter)
+            {
+                temperatureSensor = receivedTemperature;
+                temperatures.Add(receivedTemperature);
+            }
+
+            await InvokeAsync(StateHasChanged);
+        });
+
+        Connection.On<DistanceSensor>("ReceiveDistanceSensor", async (receivedDistance) =>
+       {
+           distanceSensor = receivedDistance;
+
+           await InvokeAsync(StateHasChanged);
+       });
+
+        Connection.On<InductiveSensor>("ReceiveInductiveSensor", async (receivedInductive) =>
+       {
+           inductiveSensor = receivedInductive;
+
+           await InvokeAsync(StateHasChanged);
+       });
+
+
+        await Connection.StartAsync();
+
+        await Connection.SendAsync("GetTemperatureSensor");
     }
 
-    string FormatAsUSD(object value)
+
+    async Task OnFilterClick()
     {
-        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+        busy = true;
+        if (StartDate! < EndDate)
+        {
+            await Connection.SendAsync("GetTemperatureSensor");
+            temperatures = temperatures.Where(x => x.TimeStamp >= StartDate && x.TimeStamp <= EndDate).ToList();
+            filter = true;
+        }
+        else
+            toastService.ShowError("Slut Data må ikke være før Start Dato");
+        
+
+        busy = false;
     }
 
-    DataItem[] revenue2023 = new DataItem[] {
-        new DataItem
-        {
-            Date = "Jan",
-            Revenue = 234000
-        },
-        new DataItem
-        {
-            Date = "Feb",
-            Revenue = 269000
-        },
-        new DataItem
-        {
-            Date = "Mar",
-            Revenue = 233000
-        },
-        new DataItem
-        {
-            Date = "Apr",
-            Revenue = 244000
-        },
-        new DataItem
-        {
-            Date = "May",
-            Revenue = 214000
-        },
-        new DataItem
-        {
-            Date = "Jun",
-            Revenue = 253000
-        },
-        new DataItem
-        {
-            Date = "Jul",
-            Revenue = 274000
-        },
-        new DataItem
-        {
-            Date = "Aug",
-            Revenue = 284000
-        },
-        new DataItem
-        {
-            Date = "Sept",
-            Revenue = 273000
-        },
-        new DataItem
-        {
-            Date = "Oct",
-            Revenue = 282000
-        },
-        new DataItem
-        {
-            Date = "Nov",
-            Revenue = 289000
-        },
-        new DataItem
-        {
-            Date = "Dec",
-            Revenue = 294000
-        }
-    };
+    async Task OnFilterResetClick()
+    {
+        filter = false;
+        await Connection.SendAsync("GetTemperatureSensor");
+    }
 
-    DataItem[] revenue2024 = new DataItem[] {
-        new DataItem
-        {
-            Date = "Jan",
-            Revenue = 334000
-        },
-        new DataItem
-        {
-            Date = "Feb",
-            Revenue = 369000
-        },
-        new DataItem
-        {
-            Date = "Mar",
-            Revenue = 333000
-        },
-        new DataItem
-        {
-            Date = "Apr",
-            Revenue = 344000
-        },
-        new DataItem
-        {
-            Date = "May",
-            Revenue = 314000
-        },
-        new DataItem
-        {
-            Date = "Jun",
-            Revenue = 353000
-        },
-        new DataItem
-        {
-            Date = "Jul",
-            Revenue = 374000
-        },
-        new DataItem
-        {
-            Date = "Aug",
-            Revenue = 384000
-        },
-        new DataItem
-        {
-            Date = "Sept",
-            Revenue = 373000
-        },
-        new DataItem
-        {
-            Date = "Oct",
-            Revenue = 382000
-        },
-        new DataItem
-        {
-            Date = "Nov",
-            Revenue = 389000
-        },
-        new DataItem
-        {
-            Date = "Dec",
-            Revenue = 394000
-        }
-    };
+
 }
