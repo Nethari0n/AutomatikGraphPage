@@ -8,10 +8,9 @@ namespace AutomatikProjekt.Shared
 {
     public class InductiveSensor : BaseClass
     {
+        private bool _isMetal;
         public bool IsMetal { get; set; }
-        public InductiveSensor(long timestamp) : base(timestamp)
-        {
-            TimeConverter(timestamp);
-        }
+
+
     }
 }

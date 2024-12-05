@@ -99,3 +99,17 @@ a, .btn-link {
     .loading-progress-text:after {
         content: var(--blazor-load-percentage-text, "Loading");
     }
+
+
+.rz-tick-text {
+    overflow: visible;
+}
+
+
+.PaddingGraph {
+    padding-bottom: 75px !important;
+}
+
+.test{
+    max-height: 125% !important;
+}
