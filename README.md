@@ -2,6 +2,8 @@
 
 A Blazor App that serves as a telemetry data retrieval tool, interfacing with InfluxDB to retrieve information. The app is equipped with an embedded MQTT client, enabling it to extract telemetry data from IoT devices. Additionally, the app can interface with a distance and inductive sensor (whose data does not get saved in InfluxDB) and save temperature sensor data into InfluxDB.
 
+![image006](https://github.com/user-attachments/assets/a08020eb-1be2-4cd7-9e46-599c6bce6709)
+
 WebAPI exists for Debugging purposes
 
 ## Project Details
